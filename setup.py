@@ -10,7 +10,7 @@ data_files.append(('share/ament_index/resource_index/packages', ['resource/' + p
 data_files.append(('share/' + package_name, ['launch/robot_launch.py']))
 data_files.append(('share/' + package_name, ['launch/navfix_can.py']))
 data_files.append(('share/' + package_name + '/protos', [
-    'protos/Pioneer3at.proto', 'protos/Plant.stl']))
+    'protos/Pioneer3at.proto', 'protos/Plant.proto', 'protos/Plant.stl']))
 data_files.append(('share/' + package_name + '/protos/textures', glob('protos/textures/*')))
 data_files.append(('share/' + package_name + '/worlds', [
     'worlds/pioneer3at.wbt', 'worlds/r4c.wbt']))
