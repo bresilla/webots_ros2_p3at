@@ -8,17 +8,12 @@ package_name = 'webots_ros2_p3at'
 data_files = []
 data_files.append(('share/ament_index/resource_index/packages', ['resource/' + package_name]))
 data_files.append(('share/' + package_name, ['launch/robot_launch.py']))
-data_files.append(('share/' + package_name + '/resource', [
-    'resource/turtlebot3_burger_example_map.pgm',
-    'resource/turtlebot3_burger_example_map.yaml'
-]))
+data_files.append(('share/' + package_name, ['launch/navfix_can.py']))
 data_files.append(('share/' + package_name + '/protos', [
-    'protos/Pioneer3at.proto'
-]))
+    'protos/Pioneer3at.proto', 'protos/Plant.stl']))
 data_files.append(('share/' + package_name + '/protos/textures', glob('protos/textures/*')))
 data_files.append(('share/' + package_name + '/worlds', [
-    'worlds/pioneer3at.wbt', 'worlds/.pioneer3at.wbproj',
-]))
+    'worlds/pioneer3at.wbt', 'worlds/r4c.wbt']))
 data_files.append(('share/' + package_name, ['package.xml']))
 
 
@@ -45,8 +40,12 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'p3at_driver = webots_ros2_p3at.p3at_driver:main'
+            'p3at_driver = webots_ros2_p3at.p3at_driver:main',
+            'navfix2can = webots_ros2_p3at.navfix2can:main'
         ],
-        'launch.frontend.launch_extension': ['launch_ros = launch_ros']
+        # 'launch.frontend.launch_extension': [
+        #     'launch_ros = launch_ros', 
+        #     'navfix_can = navfix_can'
+        # ]
     }
 )

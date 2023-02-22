@@ -24,9 +24,12 @@ from launch.actions import IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch import LaunchDescription
 from ament_index_python.packages import get_package_share_directory
+from launch_ros.actions import Node
 
 
 def generate_launch_description():
+    use_sim_time = True
+
     package_dir = get_package_share_directory('webots_ros2_p3at')
     world = LaunchConfiguration('world')
 
@@ -41,7 +44,18 @@ def generate_launch_description():
         ]
     )
 
+    # The robot state publisher that will publish the robot joints states
+    robot_state_publisher = Node(
+        package='robot_state_publisher',
+        executable='robot_state_publisher',
+        output='screen',
+        parameters=[{
+            'robot_description': '<robot name=""><link name=""/></robot>'
+        }],
+    )
+
     return LaunchDescription([
+        robot_state_publisher,
         DeclareLaunchArgument(
             'world',
             default_value='pioneer3at.wbt',
