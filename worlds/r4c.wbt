@@ -6,7 +6,6 @@ EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/project
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/appearances/protos/SandyGround.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/robots/adept/pioneer3/protos/Pioneer3at.proto"
 EXTERNPROTO "../protos/Plant.proto"
-EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/solids/protos/SolidBox.proto"
 
 WorldInfo {
   info [
@@ -20,14 +19,10 @@ WorldInfo {
   lineScale 0.5
 }
 Viewpoint {
-  orientation -0.2668814168906763 -0.27119320053947377 0.9247856818201621 4.645268910355627
-  position 0.2723369788287698 4.368843275640035 2.436638838883555
+  orientation -0.028425237951268854 -0.9909694589407607 -0.1310402125077248 5.887507659710244
+  position -5.778123329289491 -0.35531629712842494 3.010706113167379
   follow "Pioneer 3-AT"
   followSmoothness 0
-}
-SolidBox {
-  translation 0.57 1.02 0
-  size 0.01 0.01 2
 }
 TexturedBackground {
 }
@@ -54,14 +49,8 @@ RectangleArena {
   }
 }
 DEF PIONEER_3AT Pioneer3at {
-  translation 0.22 1.01892 -0.00205202
-  rotation 0 0 1 -1.5707953071795862
   controller "<extern>"
   extensionSlot [
-    SolidBox {
-      translation 0 0.35 0
-      size 0.01 0.01 2
-    }
     Camera {
       translation 0.115 0 0.735071
       rotation 0 -1 0 -1.0472053071795866
@@ -88,7 +77,11 @@ DEF PIONEER_3AT Pioneer3at {
   ]
 }
 Plant {
+  translation 0 -0.23 0
   nRows 100
   nCols 6
-  nScale 0.7
+  nScale 1.1
+  vertical FALSE
+  uniformity 5
+  missing 2
 }

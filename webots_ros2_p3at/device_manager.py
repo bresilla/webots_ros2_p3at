@@ -139,6 +139,6 @@ class DeviceManager:
             imu_wb_device_name = [wb_device.getName() for wb_device in imu_wb_devices if wb_device]
             device_key = '+'.join(imu_wb_device_name)
             self.__devices[device_key] = ImuDevice(self.__node, device_key, imu_wb_devices, {
-                'topic_name': '/imu',
+                'topic_name': '/imu/data',
                 'frame_id': imu_wb_device_name[0]
             })

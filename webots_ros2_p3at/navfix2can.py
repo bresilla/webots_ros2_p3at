@@ -5,20 +5,16 @@ from std_msgs.msg import Float32
 from rclpy.node import Node
 import can
 import cantools
+from haversine import haversine
 
 class NavFix2Ccan(Node):
     def __init__(self, args):
         super().__init__("NAVFIX2CAN")
-        self.gps_sub = self.create_subscription(
-            NavSatFix,
-            '/gps/gps',
-            self.gps_callback,
-            10)
-        self.speed_sub = self.create_subscription(
-            Float32,
-            '/gps/speed',
-            self.speed_callback,
-            10)
+        self.gps_sub = self.create_subscription(NavSatFix, '/gps/gps', self.gps_callback, 10)
+        self.speed_sub = self.create_subscription(Float32, '/gps/speed', self.speed_callback, 10)
+        self.dist_pub = self.create_publisher(Float32, "/gps/distance", 10)
+        self.prev = None
+        self.dist = 0
         self.dbc = """VERSION ""
         BO_ 2365475321 GBSD: 8 Vector__XXX
          SG_ GroundBasedMachineSpeed : 0|16@1+ (0.001,0) [0|64.255] "m/s" Vector__XXX
@@ -37,13 +33,18 @@ class NavFix2Ccan(Node):
             print("COULD NOT SEND THE MESSAGE")
         print(message)
 
-
     def gps_callback(self, msg):
         latitude = msg.latitude
         longitude = msg.longitude
         if not math.isnan(latitude) and not math.isnan(longitude):
             self.send2can(can.Message(arbitration_id=self.gnss.frame_id, data=self.gnss.encode({'Latitude': latitude, 'Longitude': longitude})))
             self.get_logger().info('Latitude: {latitude}, Longitude: {longitude}'.format(latitude=latitude, longitude=longitude))
+            delta = 0 if self.prev is None else haversine((self.prev[0], self.prev[1]), (latitude, longitude))
+            self.dist = float(self.dist + delta)
+            self.prev = [latitude, longitude]
+            msg = Float32()
+            msg.data = self.dist*1000
+            self.dist_pub.publish(msg)
     
     def speed_callback(self, msg):
         speed = msg.data

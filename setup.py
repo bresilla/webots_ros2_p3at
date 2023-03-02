@@ -2,20 +2,29 @@
 
 from glob import glob
 from setuptools import setup
+import os
 
 
 package_name = 'webots_ros2_p3at'
 data_files = []
 data_files.append(('share/ament_index/resource_index/packages', ['resource/' + package_name]))
-data_files.append(('share/' + package_name, ['launch/robot_launch.py']))
-data_files.append(('share/' + package_name, ['launch/navfix_can.py']))
-data_files.append(('share/' + package_name + '/protos', [
-    'protos/Pioneer3at.proto', 'protos/Plant.proto', 'protos/Plant.stl']))
+#launch files
+data_files.append((os.path.join('share', package_name), glob('launch/*.py')))
+#proto/world files
+data_files.append(('share/' + package_name + '/protos', glob('protos/*.proto')))
+data_files.append(('share/' + package_name + '/protos', glob('protos/*.stl')))
 data_files.append(('share/' + package_name + '/protos/textures', glob('protos/textures/*')))
-data_files.append(('share/' + package_name + '/worlds', [
-    'worlds/pioneer3at.wbt', 'worlds/r4c.wbt']))
-data_files.append(('share/' + package_name, ['package.xml']))
+data_files.append(('share/' + package_name + '/worlds', glob('worlds/*')))
 
+#maps
+data_files.append(('share/' + package_name + '/maps', glob('maps/*')))
+#configs
+data_files.append(('share/' + package_name + '/config', glob('config/*')))
+#params
+data_files.append(('share/' + package_name + '/params', glob('params/*')))
+
+data_files.append(('share/' + package_name, ['package.xml']))
+data_files.append((os.path.join('share', package_name), glob('config/*')))
 
 setup(
     name=package_name,
@@ -41,11 +50,12 @@ setup(
     entry_points={
         'console_scripts': [
             'p3at_driver = webots_ros2_p3at.p3at_driver:main',
-            'navfix2can = webots_ros2_p3at.navfix2can:main'
+            'navfix2can = webots_ros2_p3at.navfix2can:main',
+            'gps_renamer = webots_ros2_p3at.gps_renamer:main',
+            'detect_blob = webots_ros2_p3at.detect_blob:main',
+            'euler = webots_ros2_p3at.euler_from_quaternions:main',
+            'goto = webots_ros2_p3at.goto:main'
+
         ],
-        # 'launch.frontend.launch_extension': [
-        #     'launch_ros = launch_ros', 
-        #     'navfix_can = navfix_can'
-        # ]
     }
 )

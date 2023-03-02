@@ -62,7 +62,7 @@ class WebotsSkidSteerNode(WebotsNode):
                  back_left_encoder='back left wheel sensor',
                  back_right_encoder='back right wheel sensor',
                  command_topic='/cmd_vel',
-                 odometry_topic='/odom',
+                 odometry_topic='/wheel/odometry',
                  odometry_frame='odom',
                  robot_base_frame='base_link'
                  ):
