@@ -8,6 +8,8 @@ import os
 package_name = 'webots_ros2_p3at'
 data_files = []
 data_files.append(('share/ament_index/resource_index/packages', ['resource/' + package_name]))
+data_files.append(('share/' + package_name, ['package.xml']))
+
 #launch files
 data_files.append((os.path.join('share', package_name), glob('launch/*.py')))
 #proto/world files
@@ -23,7 +25,6 @@ data_files.append(('share/' + package_name + '/config', glob('config/*')))
 #params
 data_files.append(('share/' + package_name + '/params', glob('params/*')))
 
-data_files.append(('share/' + package_name, ['package.xml']))
 data_files.append((os.path.join('share', package_name), glob('config/*')))
 
 setup(
@@ -53,9 +54,8 @@ setup(
             'navfix2can = webots_ros2_p3at.navfix2can:main',
             'gps_renamer = webots_ros2_p3at.gps_renamer:main',
             'detect_blob = webots_ros2_p3at.detect_blob:main',
-            'euler = webots_ros2_p3at.euler_from_quaternions:main',
-            'goto = webots_ros2_p3at.goto:main'
-
+            'goto = webots_ros2_p3at.goto:main',
+            'path_server = webots_ros2_p3at.path_server:main',
         ],
     }
 )

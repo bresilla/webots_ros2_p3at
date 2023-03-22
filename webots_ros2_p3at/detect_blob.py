@@ -2,7 +2,7 @@ import cv2
 import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import Image, NavSatFix
-from std_msgs.msg import Float32
+from std_msgs.msg import Float32, Int32
 from cv_bridge import CvBridge
 import message_filters
 import numpy as np
@@ -22,11 +22,13 @@ def gauss(img):
     ax.set_ylabel('Density')
     plt.show()
 
+camera_front = []
+camera_back = []
 
 
-def blober(img):
+def blober(img, array):
     y, x = int(img.shape[0]/2), 0
-    h, w = 200, img.shape[1]
+    h, w = 150, img.shape[1]
     roi = img[y:y+h, x:x+w]
     img = roi
 
@@ -59,6 +61,37 @@ def blober(img):
     output = cv2.drawContours(seg_img, large_contours, -1, (0, 0, 255), 3)
     return output, seg_img
 
+def counter(img, topic):
+    y, x = int(img.shape[0]/2), 0
+    h, w = 10, img.shape[1]
+    roi = img[y:y+h, x:x+w]
+    img = roi
+
+    img = cv2.GaussianBlur(img, (9, 9), 0)
+    hsv_img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+    bound_lower = np.array([30, 30, 0])
+    bound_upper = np.array([90, 255, 255])
+
+    mask_green = cv2.inRange(hsv_img, bound_lower, bound_upper)
+
+    kernel = np.ones((7,7),np.uint8)
+    mask_green = cv2.morphologyEx(mask_green, cv2.MORPH_CLOSE, kernel)
+    mask_green = cv2.morphologyEx(mask_green, cv2.MORPH_OPEN, kernel)
+    mask_green = cv2.dilate(mask_green, kernel, iterations=1)
+    mask_green = cv2.erode(mask_green, kernel, iterations=1)
+
+    seg_img = cv2.bitwise_and(img, img, mask=mask_green)
+    gray_image = cv2.cvtColor(seg_img, cv2.COLOR_BGR2GRAY)
+    num_white_pixels = cv2.countNonZero(gray_image)
+    msg = Int32()
+    msg.data = num_white_pixels
+    topic.publish(msg)
+
+    return seg_img, 0
+
+    
+
+
 
 class ImageSubscriber(Node):
     def __init__(self):
@@ -69,6 +102,9 @@ class ImageSubscriber(Node):
         self.image_front = message_filters.Subscriber(self, Image, '/camera_front/image_raw')
         self.navsatfix = message_filters.Subscriber(self, NavSatFix, '/gps/gps')
         self.distance = message_filters.Subscriber(self, Float32, '/gps/distance')
+        self.pixels_front = self.create_publisher(Int32, "/pixels/front", 10)
+        self.pixels_back = self.create_publisher(Int32, "/pixels/back", 10)
+
 
         self.back_sub = message_filters.ApproximateTimeSynchronizer([self.image_back, self.navsatfix], 10, slop=10)
         self.back_sub.registerCallback(self.camera_back)
@@ -77,21 +113,25 @@ class ImageSubscriber(Node):
         self.front_sub.registerCallback(self.camera_front)
 
     def camera_front(self, img, gps):
-        print(gps.latitude)
-        print(gps.longitude)
+        global camera_front
+        # print(gps.latitude)
+        # print(gps.longitude)
+        camera_front = []
         image = self.cv_bridge.imgmsg_to_cv2(img)
-        image, _ = blober(image)
-        cv2.imshow("CAM_FRONT", image)
-        cv2.waitKey(1)
+        image, _ = counter(image, self.pixels_front)
+        # cv2.imshow("CAM_FRONT", image)
+        # cv2.waitKey(1)
 
     def camera_back(self, img, gps):
-        print(gps.latitude)
-        print(gps.longitude)
+        global camera_back
+        # print(gps.latitude)
+        # print(gps.longitude)
+        camera_back = []
         image = self.cv_bridge.imgmsg_to_cv2(img)
         image = cv2.flip(image, 1)
-        image, _ = blober(image)
-        cv2.imshow("CAM_BACK", image)
-        cv2.waitKey(1)
+        image, _ = counter(image, self.pixels_back)
+        # cv2.imshow("CAM_BACK", image)
+        # cv2.waitKey(1)
 
 def main(args=None):
     rclpy.init(args=args)

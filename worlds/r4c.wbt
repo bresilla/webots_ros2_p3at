@@ -5,7 +5,6 @@ EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/project
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/floors/protos/RectangleArena.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/appearances/protos/SandyGround.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/robots/adept/pioneer3/protos/Pioneer3at.proto"
-EXTERNPROTO "../protos/Plant.proto"
 
 WorldInfo {
   info [
@@ -15,12 +14,12 @@ WorldInfo {
   ]
   title "Pioneer 3AT"
   gpsCoordinateSystem "WGS84"
-  gpsReference 5.55567 52.544 0
+  gpsReference 51.9877 5.66295 0
   lineScale 0.5
 }
 Viewpoint {
-  orientation -0.028425237951268854 -0.9909694589407607 -0.1310402125077248 5.887507659710244
-  position -5.778123329289491 -0.35531629712842494 3.010706113167379
+  orientation 0.07817542112484832 -0.9884380812413158 0.12991829387710718 5.722594410456572
+  position -8.237760812219964 0.2726055480138068 5.878245970341625
   follow "Pioneer 3-AT"
   followSmoothness 0
 }
@@ -32,6 +31,7 @@ RectangleArena {
   floorSize 60 60
   floorTileSize 3 3
   floorAppearance SandyGround {
+    colorOverride 0.792157 0.792157 0.552941
   }
   wallThickness 0.2
   wallHeight 0.8
@@ -75,13 +75,4 @@ DEF PIONEER_3AT Pioneer3at {
       translation 0 0 0.3
     }
   ]
-}
-Plant {
-  translation 0 -0.23 0
-  nRows 100
-  nCols 6
-  nScale 1.1
-  vertical FALSE
-  uniformity 5
-  missing 2
 }

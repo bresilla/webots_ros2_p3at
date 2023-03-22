@@ -10,55 +10,17 @@ import threading
 import numpy as np
 
 
-def euler_from_quaternion(x, y, z, w):
-        t0 = +2.0 * (w * x + y * z)
-        t1 = +1.0 - 2.0 * (x * x + y * y)
-        roll_x = math.atan2(t0, t1)
-     
-        t2 = +2.0 * (w * y - z * x)
-        t2 = +1.0 if t2 > +1.0 else t2
-        t2 = -1.0 if t2 < -1.0 else t2
-        pitch_y = math.asin(t2)
-     
-        t3 = +2.0 * (w * z + x * y)
-        t4 = +1.0 - 2.0 * (y * y + z * z)
-        yaw_z = math.atan2(t3, t4)
-        return yaw_z # in radians
-
-def gotoGoal(goal, pose, orientation, precision=0.1, velocity=0.5, stop_loop=False):
-    # calculate heading to goal
-    preheading = np.arctan2((goal[1]-pose[1]), (goal[0]-pose[0]))
-    heading = preheading - orientation
-    heading_corrected = np.arctan2(np.sin(heading), np.cos(heading))
-
-	# if (angDel <= -M_PI)
-	# 	return angDel + M_PI * 2;
-	# if (angDel > M_PI)
-	# 	return angDel - M_PI * 2;
-	# return angDel;
-
-
-
-    heading_corrected = heading_corrected/np.pi
-    if heading_corrected > 0.20:
-        heading_corrected = 0.20
-    if heading_corrected < -0.20:
-        heading_corrected = -0.20
-    #calculate distance to goal 
-    distance = ((pose[0] - goal[0])**2 + (pose[1] - goal[1])**2)**0.5
-    return float(velocity), heading_corrected, distance
-
 class GoToPosition(Node):
     def __init__(self, x, y):
         super().__init__('go_to_position')
         self.publisher_ = self.create_publisher(Twist, '/cmd_vel', 10)
-        self.subscription_ = self.create_subscription(Odometry, '/odometry/local', self.odometry_callback, 10)
+        self.sub1_ = self.create_subscription(Odometry, '/odometry/global', self.imu_callback, 10)
+        self.sub2_ = self.create_subscription(Odometry, '/odometry/gps', self.gps_callback, 10)
         
-        self.gps_filtered = message_filters.Subscriber(self, Odometry, '/odometry/gps')
-        self.imu_data = message_filters.Subscriber(self, Odometry, '/odometry/global')
-        self.pose_sub = message_filters.ApproximateTimeSynchronizer([self.gps_filtered, self.imu_data], 10, slop=10)
-        self.pose_sub.registerCallback(self.pose_callback)
-
+        # self.gps_filtered = message_filters.Subscriber(self, Odometry, '/odometry/gps')
+        # self.imu_data = message_filters.Subscriber(self, Odometry, '/odometry/global')
+        # self.pose_sub = message_filters.ApproximateTimeSynchronizer([self.gps_filtered, self.imu_data], 10, slop=10)
+        # self.pose_sub.registerCallback(self.pose_callback)
 
         self.thread = None
         self.current_pose_ = Point()
@@ -68,10 +30,11 @@ class GoToPosition(Node):
         self.current_orientation_ = Quaternion()
         self.factor = [10, 100]
 
-    def odometry_callback(self, msg):
-        pass
-        # self.current_pose_ = msg.pose.pose.position
-        # self.current_orientation_ = msg.pose.pose.orientation
+    def gps_callback(self, msg):
+        self.current_pose_ = msg.pose.pose.position
+
+    def imu_callback(self, msg):
+        self.current_orientation_ = msg.pose.pose.orientation
 
     def pose_callback(self, gps_odom, imu):
         self.current_pose_ = gps_odom.pose.pose.position
